@@ -8,15 +8,13 @@ public class Movement_Controller : MonoBehaviour
     
     public float speed = 6.0f;
     public float sprintSpeed = 15.0f;
-    public float crouchSpeed = 2.0f;
 
     public float jumpSpeed = 8.0f;
-    public float gravity = 9.8f;
-
-    Vector3 moveDirection = Vector3.zero;
-    float rotationX = 0;
-
     public bool canMove = true;
+
+    private float gravity = 9.8f;
+    private Vector3 moveDirection = Vector3.zero;
+    private bool canDoubleJump = false;
 
     CharacterController characterController;
 
@@ -33,7 +31,7 @@ public class Movement_Controller : MonoBehaviour
         Vector3 forward = playerCamera.transform.TransformDirection(Vector3.forward);
         Vector3 right = playerCamera.transform.TransformDirection(Vector3.right);
 
-        float curSpeed = canMove ? (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : (Input.GetKey(KeyCode.LeftControl) ? crouchSpeed : speed)) : 0;
+        float curSpeed = canMove ? (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : speed) : 0;
         float curSpeedX = curSpeed * Input.GetAxis("Vertical");
         float curSpeedY = curSpeed * Input.GetAxis("Horizontal");
         float movementDirectionY = moveDirection.y;
@@ -41,9 +39,14 @@ public class Movement_Controller : MonoBehaviour
         #endregion
 
         #region Jump
-        if (characterController.isGrounded && Input.GetButton("Jump") && canMove)
+        bool isJumpInput = Input.GetButtonDown("Jump") && canMove;
+        if (characterController.isGrounded && isJumpInput)
         {
             moveDirection.y = jumpSpeed;
+        } else if (canDoubleJump && isJumpInput)
+        {
+            moveDirection.y = jumpSpeed;
+            canDoubleJump = false;
         }
         else
         {
@@ -53,7 +56,11 @@ public class Movement_Controller : MonoBehaviour
         if (!characterController.isGrounded)
         {
             moveDirection.y -= gravity * Time.deltaTime;
+        } else {
+            canDoubleJump = true;
         }
+
+
         #endregion
 
         characterController.Move(moveDirection * Time.deltaTime);
