@@ -27,10 +27,10 @@ public class Camera_Controller : MonoBehaviour
         #region Camera Around Player
         float xMove = Input.GetAxis("Mouse Y") * lookSpeed;
         float yMove = Input.GetAxis("Mouse X") * lookSpeed;
-        playerCamera.transform.RotateAround(player.transform.position, Vector3.right, xMove);
+        
         playerCamera.transform.RotateAround(player.transform.position, Vector3.up, yMove);
-
-        // Cannot be below player
+        playerCamera.transform.RotateAround(player.transform.position, playerCamera.transform.right, -xMove);
+        
         if (playerCamera.transform.position.y < player.transform.position.y)
         {
             playerCamera.transform.position = new Vector3(playerCamera.transform.position.x, player.transform.position.y, playerCamera.transform.position.z);
